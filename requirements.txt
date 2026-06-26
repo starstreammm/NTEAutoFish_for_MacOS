@@ -1,0 +1,7 @@
+yaml
+opencv-python
+mss
+numpy
+pynput
+pydantic
+scikit-image
