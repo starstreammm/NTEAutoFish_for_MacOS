@@ -106,7 +106,7 @@ while True:
 
         is_timeout = True
         for _ in range(8):
-            if ScreenCheck.is_pullup():
+            if ScreenCheck.is_exp():
                 is_timeout = False
                 break
             time.sleep(3)

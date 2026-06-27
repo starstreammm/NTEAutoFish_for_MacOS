@@ -13,7 +13,7 @@
 	<img alt="GitHub Issues or Pull Requests" src="https://img.shields.io/github/issues/Xu-Xihe/svtav1UI">
   <br />
   <br />
-  <a herf="./README.md">简体中文</a> | <a herf="./README_en.md">English</a>
+  <a href="./README.md">简体中文</a> | <a href="./README_en.md">English</a>
   <br />
  </div>
 ## 0 Introduction
