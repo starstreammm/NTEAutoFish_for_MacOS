@@ -99,11 +99,19 @@ while True:
         continue  # Skip pause
 
     elif turn == 1 and (time.time() - timer > MAX_WAIT_TIME):
-        if ScreenCheck.is_exp():
-            turn = 3
-            t_fish -= 1  # Decrement fish count since no fish was caught
-            continue  # Skip pause
+        if Config._sys_config.en:
+            Logger.info("Timeout, no pull-up detected, waiting for pause confirmation.")
         else:
+            Logger.info("超时未检测到上鱼, 等待暂停确认.")
+
+        is_timeout = True
+        for _ in range(8):
+            if ScreenCheck.is_pullup():
+                is_timeout = False
+                break
+            time.sleep(3)
+
+        if is_timeout:
             if Config._sys_config.en:
                 Logger.info(
                     "Timeout: No pull-up detected, possibly due to insufficient bait. Pausing the bot as per the stop_when_no_pullup setting."
@@ -114,8 +122,13 @@ while True:
                 )
             if Config._sys_config.stop_when_no_pullup:
                 Mouse._pause.clear()  # Pause the bot
+        else:
+            turn = 3
+            t_fish -= 1  # Decrement fish count since no fish was caught
+            continue  # Skip pause
 
     elif turn == 2 and (ScreenCheck.is_fish() or (time.time() - timer > 3)):
+        timer = time.time()  # Reset the timer when start fishing
         Logger.debug("Turn 2: Fishing, moving cursor.")
 
         last_press = None
@@ -176,6 +189,8 @@ while True:
 
         # -------- 退出兜底 --------
         release_all()
+        if time.time() - timer > 8.8:
+            v_fish += 1  # Decrement fish count since no fish was caught
         turn = 3
 
     elif turn == 3 and (ScreenCheck.is_exp() or (time.time() - timer > MAX_EXP_TIME)):
@@ -184,15 +199,13 @@ while True:
         turn = 0
         t_fish += 1
         total_time = time.time() - t_timer
-        if total_time > VALUE_THRESHOLD:
-            v_fish += 1
         if Config._sys_config.en:
             Logger.info(
-                f"Index: {t_fish:>3}, Time: {datetime.now(timezone.utc).astimezone().strftime('%Y-%m-%d %H:%M:%S')}, Duration: {total_time:.1f} seconds, Value: {"low(green/blue)" if total_time < VALUE_THRESHOLD else "high(purple/gold)"}, Total: {t_fish-v_fish:>3}:{v_fish:>2}:{t_fish:>3}."
+                f"Index: {t_fish:>3}, Time: {datetime.now(timezone.utc).astimezone().strftime('%Y-%m-%d %H:%M:%S')}, Duration: {total_time:.1f} seconds, Total: {t_fish-v_fish:>3}:{v_fish:>2}:{t_fish:>3}."
             )
         else:
             Logger.info(
-                f"序号: {t_fish:>3}, 时间: {datetime.now(timezone.utc).astimezone().strftime('%Y-%m-%d %H:%M:%S')}, 本次用时: {total_time:.1f} s, 价值: {"低(绿/蓝)" if total_time < VALUE_THRESHOLD else "高(紫/金)"}, 总计: {t_fish-v_fish:>3}:{v_fish:>2}:{t_fish:>3}."
+                f"序号: {t_fish:>3}, 时间: {datetime.now(timezone.utc).astimezone().strftime('%Y-%m-%d %H:%M:%S')}, 本次用时: {total_time:.1f} s, 总计: {t_fish-v_fish:>3}:{v_fish:>2}:{t_fish:>3}."
             )
 
     time.sleep(0.8)  # Prevent CPU overuse

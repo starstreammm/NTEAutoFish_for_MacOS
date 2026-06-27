@@ -103,7 +103,7 @@ python main.py
 
 #### Exp 区域
 
-文件位于根目录下 `resource/exp.png`, 图像大小为106 × 60. 右侧边界为0最右侧黑色像素行, 程序会识别钓鱼等级为10时的变化.
+文件位于根目录下 `resource/exp.png`, 图像大小为78 ×  60.
 
 ![exp](./resource/exp.png)
 

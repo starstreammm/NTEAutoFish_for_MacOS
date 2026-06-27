@@ -103,7 +103,7 @@ This refers to the top slider bar in stage 3. Use the inner dark-black backgroun
 
 #### Exp Region
 
-File located at `resource/exp.png`, image size is 106 × 60. The right boundary corresponds to the rightmost black pixel column. The program detects changes when fishing level reaches 10.
+File located at `resource/exp.png`, image size is 78 × 60.
 
 ![exp](./resource/exp.png)
 
