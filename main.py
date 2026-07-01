@@ -84,7 +84,7 @@ while True:
 
     if turn == 0:  # Not fishing
         # auto sell
-        if Config._sys_config.auto_sell and t_fish > 0 and t_fish % 1 == 0:
+        if Config._sys_config.auto_sell and t_fish > 0 and t_fish % 300 == 0:
             if Config._sys_config.en:
                 Logger.info("Auto selling items.")
             else:
