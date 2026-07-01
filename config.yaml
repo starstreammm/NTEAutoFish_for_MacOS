@@ -1,4 +1,5 @@
 en: false
 stop_when_no_pullup: true
+auto_sell: true
 random: 1.0
 log_level: INFO

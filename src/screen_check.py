@@ -6,7 +6,13 @@ from typing import Tuple
 from pathlib import Path
 from skimage.metrics import structural_similarity as ssim
 
-from src.model import GREEN_LOWER, GREEN_UPPER, YELLOW_LOWER, YELLOW_UPPER, area
+from src.model import (
+    GREEN_LOWER,
+    GREEN_UPPER,
+    YELLOW_LOWER,
+    YELLOW_UPPER,
+    areaInfo,
+)
 from src.logger import Logger
 from src.config import Config
 
@@ -48,7 +54,7 @@ class ScreenCheck:
 
     @classmethod
     def is_fish(cls) -> bool:
-        hsv_img, _ = cls.get_screen_shot(Config._areaFish)
+        hsv_img, _ = cls.get_screen_shot(Config._i.fish)
         green = cls.color_persantage(hsv_img, GREEN_LOWER, GREEN_UPPER)
         yellow = cls.color_persantage(hsv_img, YELLOW_LOWER, YELLOW_UPPER)
         Logger.debug(f"is_fish: green={green}, yellow={yellow}")
@@ -59,7 +65,7 @@ class ScreenCheck:
         """
         Returns the center x-coordinates of the largest green and yellow contours in the given HSV image.
         """
-        hsv_img, _ = cls.get_screen_shot(Config._areaFish)
+        hsv_img, _ = cls.get_screen_shot(Config._i.fish)
         center_b = cls.get_largest_color_center_x(hsv_img, GREEN_LOWER, GREEN_UPPER)
         center_c = cls.get_largest_color_center_x(hsv_img, YELLOW_LOWER, YELLOW_UPPER)
         if center_b is None or center_c is None:
@@ -69,7 +75,7 @@ class ScreenCheck:
 
     @classmethod
     def is_pullup(cls) -> bool:
-        _, grey_img = cls.get_screen_shot(Config._areaPullup)
+        _, grey_img = cls.get_screen_shot(Config._i.pullup)
 
         if cls._pullup_img is None or grey_img is None:
             raise ValueError("Picture reading failed")
@@ -85,7 +91,7 @@ class ScreenCheck:
 
     @classmethod
     def is_exp(cls) -> bool:
-        _, grey_img = cls.get_screen_shot(Config._areaExp)
+        _, grey_img = cls.get_screen_shot(Config._i.exp)
 
         if cls._exp_img is None or grey_img is None:
             raise ValueError("Picture reading failed")
@@ -100,7 +106,7 @@ class ScreenCheck:
         return float(score[0]) > SSIM_THRESHOLD
 
     @staticmethod
-    def get_screen_shot(region: area) -> tuple[np.ndarray, np.ndarray]:
+    def get_screen_shot(region: areaInfo) -> tuple[np.ndarray, np.ndarray]:
         """
         Captures a screenshot of the specified monitor and returns it as a NumPy array in BGR format.
         """

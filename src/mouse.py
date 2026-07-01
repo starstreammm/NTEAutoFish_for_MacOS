@@ -8,7 +8,8 @@ from pynput.mouse import (
 )
 
 from src.config import Config
-from src.rd import random_delay
+from src.rd import random_click
+from src.model import axisInfo
 
 
 class Mouse:
@@ -20,13 +21,17 @@ class Mouse:
     _pause.clear()
 
     @classmethod
-    def mouse_click(cls):
-        cls._mouse.position = (
-            Config._screen_info.width // 2,
-            Config._screen_info.height // 2,
-        )
+    def mouse_click(
+        cls,
+        position: axisInfo = axisInfo(
+            x=Config._i.screen.width // 2,
+            y=Config._i.screen.height // 2,
+        ),
+    ):
+        cls._mouse.position = (position.x, position.y)
+        time.sleep(0.01)
         cls._mouse.press(Button.left)
-        random_delay()
+        random_click()
         cls._mouse.release(Button.left)
 
     @classmethod

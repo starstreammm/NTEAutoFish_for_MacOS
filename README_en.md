@@ -59,6 +59,10 @@ See 3 Runtime Mechanism and Device Compatibility.
 python main.py
 ```
 
+> [!TIP]
+>
+> Set multiplayer - permission to only friends/no permission, to prevent the multi-player application effects the pullup detection.
+
 ## 2 Configuration
 
 The configuration file is located at `config.yaml` in the root directory.
@@ -67,6 +71,7 @@ The configuration file is located at `config.yaml` in the root directory.
 | ------------------- | ------------------------------------------------------------ |
 | en                  | English mode                                                 |
 | stop_when_no_pullup | Whether to stop fishing when pullup detection times out (i.e., bait is exhausted) |
+| auto_sell           | Auto sell the fish per 300.                                  |
 | random              | Random scale factor; do not modify unless necessary          |
 | log_level           | Logging level: INFO / DEBUG                                  |
 
@@ -106,6 +111,20 @@ This refers to the top slider bar in stage 3. Use the inner dark-black backgroun
 File located at `resource/exp.png`, image size is 78 × 60.
 
 ![exp](./resource/exp.png)
+
+#### Sell Region
+
+##### cabin
+
+Choose the fish cabin at the left.
+
+##### sell
+
+Choose sell all at the button.
+
+##### confirm
+
+Click confirm at the pop-out window.
 
 ## 4 Acknowledgements
 

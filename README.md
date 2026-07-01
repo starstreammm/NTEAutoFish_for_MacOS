@@ -60,6 +60,10 @@ pip install -r requirements.txt
 python main.py
 ```
 
+> [!TIP]
+>
+> 请于多人游戏—权限管理中, 选择仅限好友/不允许, 以避免陌生申请影响上鱼检测.
+
 ## 2 配置项
 
 配置文件位于根目录 `config.yaml` 中.
@@ -68,6 +72,7 @@ python main.py
 | ------------------- | ----------------------------------------------- |
 | en                  | 英文                                            |
 | stop_when_no_pullup | 当pullup检测超时, 即当鱼饵耗尽时, 是否停止钓鱼. |
+| auto_sell           | 每300条鱼自动卖出.                              |
 | random              | 随机数scale, 如非必要无需更改                   |
 | log_level           | 日志等级, INFO / DEBUG                          |
 
@@ -107,6 +112,20 @@ python main.py
 文件位于根目录下 `resource/exp.png`, 图像大小为78 ×  60.
 
 ![exp](./resource/exp.png)
+
+#### Sell 区域
+
+##### cabin
+
+左侧选择归流鱼舱.
+
+##### sell
+
+下部选择一键售出.
+
+##### confirm
+
+在弹出窗口点击确认.
 
 ## 4 致谢
 

@@ -4,22 +4,23 @@ import time
 import sys
 
 from datetime import datetime, timezone
-from pynput.keyboard import Controller as KeyboardController
+from pynput.keyboard import Controller as KeyboardController, Key
 
 from src.config import Config
 from src.mouse import Mouse
 from src.logger import Logger
-from src.rd import random_delay
+from src.rd import random_delay, random_click, random_wait
 from src.screen_check import ScreenCheck
 
 MAX_WAIT_TIME = 13
 MAX_EXP_TIME = 18  # Slightly bigger
-VALUE_THRESHOLD = 22.6
+VALUE_THRESHOLD = 8.8
 ALPHA = 0.83  # EMA 平滑系数
 DEAD_ZONE = 33
 
 turn = 0  # 0 = not fishing, 1 = pulling up, 2 = fishing, 3 = exp
 timer = 0.0
+err_confim = 0
 s_timer = datetime.now(timezone.utc)
 t_timer = 0.0
 t_fish = 0
@@ -82,12 +83,35 @@ while True:
         continue  # Skip the rest of the loop and check the pause state again
 
     if turn == 0:  # Not fishing
+        # auto sell
+        if Config._sys_config.auto_sell and t_fish > 0 and t_fish % 1 == 0:
+            if Config._sys_config.en:
+                Logger.info("Auto selling items.")
+            else:
+                Logger.info("自动出售已获得鱼货.")
+            ky.press("q")
+            random_delay()
+            ky.release("q")
+            random_wait()
+            Mouse.mouse_click(Config._i.sell.cabin)
+            random_wait()
+            Mouse.mouse_click(Config._i.sell.sell)
+            random_wait()
+            Mouse.mouse_click(Config._i.sell.confirm)
+            random_wait()
+            Mouse.mouse_click()
+            random_wait()
+            ky.press(Key.esc)
+            random_delay()
+            ky.release(Key.esc)
+
         t_timer = timer = time.time()  # Reset the timer when start fishing
         ky.press("f")
         random_delay()
         ky.release("f")
         turn = 1
         Logger.debug("Turn 0: Start fishing.")
+        time.sleep(1.3)
 
     elif turn == 1 and ScreenCheck.is_pullup():
         ky.press("f")
@@ -106,22 +130,27 @@ while True:
 
         is_timeout = True
         for _ in range(8):
+            time.sleep(3)
             if ScreenCheck.is_exp():
                 is_timeout = False
                 break
-            time.sleep(3)
 
         if is_timeout:
-            if Config._sys_config.en:
-                Logger.info(
-                    "Timeout: No pull-up detected, possibly due to insufficient bait. Pausing the bot as per the stop_when_no_pullup setting."
-                )
+            if err_confim < 3:
+                err_confim += 1
+                turn = 0
             else:
-                Logger.info(
-                    "超时未检测到上鱼, 可能由于鱼饵不足, 按照设置项 stop_when_no_pullup 暂停自动钓鱼."
-                )
-            if Config._sys_config.stop_when_no_pullup:
-                Mouse._pause.clear()  # Pause the bot
+                if Config._sys_config.en:
+                    Logger.info(
+                        "Timeout: No pull-up detected, possibly due to insufficient bait. Pausing the bot as per the stop_when_no_pullup setting."
+                    )
+                else:
+                    Logger.info(
+                        "超时未检测到上鱼, 可能由于鱼饵不足, 按照设置项 stop_when_no_pullup 暂停自动钓鱼."
+                    )
+                if Config._sys_config.stop_when_no_pullup:
+                    err_confim = 0
+                    Mouse._pause.clear()  # Pause the bot
         else:
             turn = 3
             t_fish -= 1  # Decrement fish count since no fish was caught
@@ -150,9 +179,14 @@ while True:
                 release_all()
 
                 if not ScreenCheck.is_fish():
-                    Logger.debug("Fish lost, exit loop.")
-                    timer = time.time()  # Reset the start time when fish is detected
-                    time.sleep(1.3)
+                    Logger.debug("Fish lost or pulled up, exit loop.")
+
+                    if (time.time() - timer) > VALUE_THRESHOLD:
+                        v_fish += 1
+                    timer = time.time()
+
+                    turn = 3
+                    time.sleep(0.8)
                     break
 
                 time.sleep(0.1)
@@ -187,12 +221,6 @@ while True:
 
             time.sleep(0.01)
 
-        # -------- 退出兜底 --------
-        release_all()
-        if time.time() - timer > 8.8:
-            v_fish += 1  # Decrement fish count since no fish was caught
-        turn = 3
-
     elif turn == 3 and (ScreenCheck.is_exp() or (time.time() - timer > MAX_EXP_TIME)):
         Logger.debug("Turn 3: Wait for EXP.")
         Mouse.mouse_click()
@@ -207,5 +235,6 @@ while True:
             Logger.info(
                 f"序号: {t_fish:>3}, 时间: {datetime.now(timezone.utc).astimezone().strftime('%Y-%m-%d %H:%M:%S')}, 本次用时: {total_time:.1f} s, 总计: {t_fish-v_fish:>3}:{v_fish:>2}:{t_fish:>3}."
             )
+        random_click()
 
     time.sleep(0.8)  # Prevent CPU overuse
