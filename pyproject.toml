@@ -1,0 +1,13 @@
+[project]
+name = "nteautofish-for-macos"
+version = "0.1.0"
+requires-python = ">=3.14"
+dependencies = [
+    "mss>=10.2.0",
+    "numpy>=2.5.3",
+    "opencv-python>=5.0.0.93",
+    "pydantic>=2.13.5",
+    "pynput>=1.8.2",
+    "pyyaml>=6.0.3",
+    "scikit-image>=0.26.0",
+]
